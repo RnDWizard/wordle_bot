@@ -1,0 +1,58 @@
+#@title Wordle Bot
+import pandas as pd
+# carol and inset
+df = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/Wordle Solver/wordle-answers-alphabetical.txt', header = None)
+df.columns = ['word']
+print('Hi I am Wordle Bot, press the Play button to get going')
+
+print('Please enter carol and inset as your first two words')
+
+# remove non letters
+print('Enter non characters divided by a comma e.g. a,b,c')
+discard = input()
+discard = discard.split(",")
+df = df[~df.word.str.contains('|'.join(discard))]
+
+# search wildcards
+print('Enter wild divided by comma e.g. a,b,c')
+wild = input()
+wild = wild.split(",")
+for i in wild:
+    # print(i)
+    df = df[df["word"].str.contains(i) == True]
+
+
+# Search known
+print('Enter number of known letters')
+numknown = input()
+numknown = int(numknown)
+
+print('Enter Known Letter positions, with unknowns as ? e.g. ?a???')
+known = input()
+
+df['first'] = 0
+df['second'] = 0
+df['thir'] = 0
+df['fourth'] = 0
+df['five'] = 0
+df['sum'] = 0
+
+for index, row in df.iterrows():
+    ref = (row['word'])
+    ind = index
+    if ref[0] == known[0]:
+        df.at[ind,'first'] = 1
+    if ref[1] == known[1]:
+        df.at[ind,'second'] = 1
+    if ref[2] == known[2]:
+        df.at[ind,'thir'] = 1
+    if ref[3] == known[3]:
+        df.at[ind,'fourth'] = 1
+    if ref[4] == known[4]:
+        df.at[ind,'five'] = 1
+    df.at[ind,'sum'] = (df.at[ind,'first']) + df.at[ind,'second'] + df.at[ind,'thir'] + df.at[ind,'fourth'] + df.at[ind,'five']
+
+df = df[df['sum'] >= numknown]
+
+print('Possible words are')
+print(df['word'])
